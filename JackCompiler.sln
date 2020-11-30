@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jack", "Jack\Jack.fsproj", "{954627D2-5CC1-40B0-B933-88ACC123B949}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Jack.Test", "Jack.Test\Jack.Test.fsproj", "{275C670E-56E2-40B8-9F0C-81EB1D7391D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{954627D2-5CC1-40B0-B933-88ACC123B949}.Release|x64.Build.0 = Release|Any CPU
 		{954627D2-5CC1-40B0-B933-88ACC123B949}.Release|x86.ActiveCfg = Release|Any CPU
 		{954627D2-5CC1-40B0-B933-88ACC123B949}.Release|x86.Build.0 = Release|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Debug|x64.Build.0 = Debug|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Debug|x86.Build.0 = Debug|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Release|x64.ActiveCfg = Release|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Release|x64.Build.0 = Release|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{275C670E-56E2-40B8-9F0C-81EB1D7391D6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
