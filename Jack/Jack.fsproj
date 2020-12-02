@@ -1,12 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="Program.fs" />
+    <Compile Include="VirtualMachine.fs" />
+    <Compile Include="Assembly.fs" />
+    <Compile Include="Translator.fs" />
+    <Compile Include="UseCases.fs" />
+    <Compile Include="EntryPoint.fs" />
   </ItemGroup>
-
 </Project>
