@@ -1,0 +1,15 @@
+name: Build and Test
+description: Build and test .NET project
+inputs:
+  project:
+    description: Project to build
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: dotnet restore
+      shell: bash
+    - run: dotnet build --configuration Release --no-restore
+      shell: bash
+    - run: dotnet test --no-restore --verbosity normal
+      shell: bash
