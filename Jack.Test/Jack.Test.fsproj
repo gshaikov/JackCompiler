@@ -6,6 +6,7 @@
     <ProjectReference Include="..\Jack\Jack.fsproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="VirtualMachine.fs" />
     <Compile Include="Translator.fs" />
     <Compile Include="UseCases.fs" />
   </ItemGroup>
