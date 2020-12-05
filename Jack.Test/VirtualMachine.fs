@@ -1,16 +1,10 @@
 namespace Jack.Test.VirtualMachine
 
 open Xunit
+open Jack.Test
+
 open Jack
 open VirtualMachine
-
-module FAssert =
-    let Unwrap result =
-        match result with
-        | Ok r -> r
-        | Error e -> failwith e
-
-    let StrictEqual expected result = Assert.StrictEqual(expected, result)
 
 module parse =
 

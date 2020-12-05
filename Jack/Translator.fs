@@ -6,117 +6,121 @@ let TempBaseAddress = 5
 
 let push location =
     let loadOffset offset =
-        [ AI(Value offset)
-          CI([ D ], Just A, NoJump) ]
+        [ AI(Address.Value offset)
+          CI(D, Just Reg.A, NoJump) ]
 
     let loadValueWithOffsetFromSegment symbol =
-        [ AI(MemorySegmentPointer symbol)
-          CI([ A ], Add(M, D), NoJump)
-          CI([ D ], Just M, NoJump) ]
+        [ AI(Address.MemorySegmentPointer symbol)
+          CI(A, Add(Reg.M, Reg.D), NoJump)
+          CI(D, Just Reg.M, NoJump) ]
 
-    let loadValueFrom addr = [ AI(addr); CI([ D ], Just M, NoJump) ]
+    let loadValueFrom addr = [ AI(addr); CI(D, Just Reg.M, NoJump) ]
 
     let writeToStack =
-        [ AI(MemorySegmentPointer StackPointer)
-          CI([ M ], Inc M, NoJump)
-          CI([ A ], Dec M, NoJump)
-          CI([ M ], Just D, NoJump) ]
+        [ AI(Address.MemorySegmentPointer Address.StackPointer)
+          CI(M, Inc Reg.M, NoJump)
+          CI(A, Dec Reg.M, NoJump)
+          CI(M, Just Reg.D, NoJump) ]
 
     match location with
     | VirtualMachine.Local offset ->
         loadOffset offset
-        @ loadValueWithOffsetFromSegment Local
+        @ loadValueWithOffsetFromSegment Address.Local
         @ writeToStack
     | VirtualMachine.Argument offset ->
         loadOffset offset
-        @ loadValueWithOffsetFromSegment Argument
+        @ loadValueWithOffsetFromSegment Address.Argument
         @ writeToStack
     | VirtualMachine.This offset ->
         loadOffset offset
-        @ loadValueWithOffsetFromSegment This
+        @ loadValueWithOffsetFromSegment Address.This
         @ writeToStack
     | VirtualMachine.That offset ->
         loadOffset offset
-        @ loadValueWithOffsetFromSegment That
+        @ loadValueWithOffsetFromSegment Address.That
         @ writeToStack
     | VirtualMachine.Constant c -> loadOffset c @ writeToStack
-    | VirtualMachine.Static name -> loadValueFrom (Variable name) @ writeToStack
+    | VirtualMachine.Static name -> loadValueFrom (Address.Variable name) @ writeToStack
     | VirtualMachine.Pointer p ->
         match p with
         | VirtualMachine.ToThis ->
-            loadValueFrom (MemorySegmentPointer This)
+            loadValueFrom (Address.MemorySegmentPointer Address.This)
             @ writeToStack
         | VirtualMachine.ToThat ->
-            loadValueFrom (MemorySegmentPointer That)
+            loadValueFrom (Address.MemorySegmentPointer Address.That)
             @ writeToStack
     | VirtualMachine.Temp offset ->
-        [ AI(Value(TempBaseAddress + offset))
-          CI([ D ], Just M, NoJump) ]
+        [ AI(Address.Value(TempBaseAddress + offset))
+          CI(D, Just Reg.M, NoJump) ]
         @ writeToStack
 
 let pop location =
     let popToPointedSegment segment offset =
-        [ AI(Value offset)
-          CI([ D ], Just A, NoJump)
-          AI(MemorySegmentPointer segment)
-          CI([ D ], Add(M, D), NoJump)
-          AI(MemorySegmentPointer StackPointer)
-          CI([ M ], Dec M, NoJump)
-          CI([ A ], Inc M, NoJump)
-          CI([ M ], Just D, NoJump)
-          CI([ A ], Dec A, NoJump)
-          CI([ D ], Just M, NoJump)
-          CI([ A ], Inc A, NoJump)
-          CI([ M ], Just D, NoJump) ]
+        [ AI(Address.Value offset)
+          CI(D, Just Reg.A, NoJump)
+          AI(Address.MemorySegmentPointer segment)
+          CI(D, Add(Reg.M, Reg.D), NoJump)
+          AI(Address.MemorySegmentPointer Address.StackPointer)
+          CI(M, Dec Reg.M, NoJump)
+          CI(A, Inc Reg.M, NoJump)
+          CI(M, Just Reg.D, NoJump)
+          CI(A, Dec Reg.A, NoJump)
+          CI(D, Just Reg.M, NoJump)
+          CI(A, Inc Reg.A, NoJump)
+          CI(M, Just Reg.D, NoJump) ]
 
     let popToFixedSegment addr =
-        [ AI(MemorySegmentPointer StackPointer)
-          CI([ A; M ], Dec M, NoJump)
-          CI([ D ], Just M, NoJump)
+        [ AI(Address.MemorySegmentPointer Address.StackPointer)
+          CI(AM, Dec Reg.M, NoJump)
+          CI(D, Just Reg.M, NoJump)
           AI(addr)
-          CI([ M ], Just D, NoJump) ]
+          CI(M, Just Reg.D, NoJump) ]
 
     match location with
-    | VirtualMachine.Local offset -> popToPointedSegment Local offset
-    | VirtualMachine.Argument offset -> popToPointedSegment Argument offset
-    | VirtualMachine.This offset -> popToPointedSegment This offset
-    | VirtualMachine.That offset -> popToPointedSegment That offset
+    | VirtualMachine.Local offset -> popToPointedSegment Address.Local offset
+    | VirtualMachine.Argument offset -> popToPointedSegment Address.Argument offset
+    | VirtualMachine.This offset -> popToPointedSegment Address.This offset
+    | VirtualMachine.That offset -> popToPointedSegment Address.That offset
     | VirtualMachine.Constant _ -> failwith "pop to constant segment is illegal"
-    | VirtualMachine.Static name -> Variable name |> popToFixedSegment
+    | VirtualMachine.Static name -> Address.Variable name |> popToFixedSegment
     | VirtualMachine.Pointer p ->
         match p with
-        | VirtualMachine.ToThis -> MemorySegmentPointer This |> popToFixedSegment
-        | VirtualMachine.ToThat -> MemorySegmentPointer That |> popToFixedSegment
+        | VirtualMachine.ToThis ->
+            Address.MemorySegmentPointer Address.This
+            |> popToFixedSegment
+        | VirtualMachine.ToThat ->
+            Address.MemorySegmentPointer Address.That
+            |> popToFixedSegment
     | VirtualMachine.Temp offset ->
-        Value(TempBaseAddress + offset)
+        Address.Value(TempBaseAddress + offset)
         |> popToFixedSegment
 
 let operator1 operator =
-    [ AI(MemorySegmentPointer StackPointer)
-      CI([ A ], Dec M, NoJump)
-      CI([ M ], operator M, NoJump) ]
+    [ AI(Address.MemorySegmentPointer Address.StackPointer)
+      CI(A, Dec Reg.M, NoJump)
+      CI(M, operator Reg.M, NoJump) ]
 
 let operator2 operator =
-    [ AI(MemorySegmentPointer StackPointer)
-      CI([ A; M ], Dec M, NoJump)
-      CI([ D ], Just M, NoJump)
-      CI([ A ], Dec A, NoJump)
-      CI([ M ], operator (M, D), NoJump) ]
+    [ AI(Address.MemorySegmentPointer Address.StackPointer)
+      CI(AM, Dec Reg.M, NoJump)
+      CI(D, Just Reg.M, NoJump)
+      CI(A, Dec Reg.A, NoJump)
+      CI(M, operator (Reg.M, Reg.D), NoJump) ]
 
 let compare2 jmp freeLabel =
     let ifTrue = freeLabel + "_if_true"
     let endIf = freeLabel + "_end_if"
-    [ AI(MemorySegmentPointer StackPointer)
-      CI([ A; M ], Dec M, NoJump)
-      CI([ D ], Just M, NoJump)
-      CI([ A ], Dec A, NoJump)
-      CI([ D ], Sub(M, D), NoJump)
-      AI(Variable ifTrue)
-      CI([], Just D, jmp)
-      AI(Variable endIf)
-      CI([ D ], Zero, JumpAnyway)
+    [ AI(Address.MemorySegmentPointer Address.StackPointer)
+      CI(AM, Dec Reg.M, NoJump)
+      CI(D, Just Reg.M, NoJump)
+      CI(A, Dec Reg.A, NoJump)
+      CI(D, Sub(Reg.M, Reg.D), NoJump)
+      AI(Address.Variable ifTrue)
+      CI(NoDest, Just Reg.D, jmp)
+      AI(Address.Variable endIf)
+      CI(D, Zero, JumpAnyway)
       Label ifTrue
-      CI([ D ], One, NoJump)
+      CI(D, One, NoJump)
       Label endIf ]
 
 
