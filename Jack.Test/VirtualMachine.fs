@@ -6,26 +6,47 @@ open Jack.Test
 open Jack
 open VirtualMachine
 
+module StringUtils =
+
+    [<Fact>]
+    let TestTryTake () =
+        StringUtils.tryTake 2 "abcd"
+        |> FAssert.StrictEqual(Some("ab"))
+        StringUtils.tryTake 2 "d"
+        |> FAssert.StrictEqual None
+        StringUtils.tryTake 2 ""
+        |> FAssert.StrictEqual None
+
+    [<Fact>]
+    let TestStartsWith () =
+        StringUtils.startsWith "abc" "abcd"
+        |> FAssert.StrictEqual true
+        StringUtils.startsWith "abc" "dsfsd"
+        |> FAssert.StrictEqual false
+        StringUtils.startsWith "abc" ""
+        |> FAssert.StrictEqual false
+
 module parse =
 
     let testCases: obj [] seq =
         seq {
+            yield [| ""; PNone |]
+            yield [| "// something"; PNone |]
             yield
                 [| "push constant 4"
-                   Push(Constant 4) |]
-            yield [| "push local 0"; Push(Local 0) |]
+                   POk(Push(Constant 4)) |]
+            yield [| "push local 0"; POk(Push(Local 0)) |]
             yield
                 [| "push static 2"
-                   Push(Static "exampleFile.2") |]
-            yield [| "pop local 99"; Pop(Local 99) |]
-            yield [| "add"; Add |]
-            yield [| "neg"; Negate |]
-            yield [| "and"; And |]
-            yield [| "or"; Or |]
+                   POk(Push(Static "exampleFile.2")) |]
+            yield [| "pop local 99"; POk(Pop(Local 99)) |]
+            yield [| "add"; POk(Add) |]
+            yield [| "neg"; POk(Negate) |]
+            yield [| "and"; POk(And) |]
+            yield [| "or"; POk(Or) |]
         }
 
     [<Theory; MemberData("testCases")>]
-    let TestOk (instruction: string, expected: VirtualMachine.Instruction) =
+    let Test (instruction, expected) =
         parse "exampleFile" instruction
-        |> FAssert.Unwrap
         |> FAssert.StrictEqual expected

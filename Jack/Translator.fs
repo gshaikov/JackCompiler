@@ -4,8 +4,6 @@ open Jack.Assembly
 
 let TempBaseAddress = 5
 
-let comment line = [ Assembly.Comment line ]
-
 let push location =
     let loadOffset offset =
         [ AI(Address.Value offset)
@@ -124,22 +122,24 @@ let compare2 jmp freeLabel =
       AI(Address.Variable endIf)
       CI(D, Zero, JumpAnyway)
       Label ifTrue
-      CI(D, One, NoJump)
-      Label endIf ]
+      CI(D, MinusOne, NoJump)
+      Label endIf
+      AI(Address.MemorySegmentPointer Address.StackPointer)
+      CI(A, Dec Reg.M, NoJump)
+      CI(M, Just Reg.D, NoJump) ]
 
 
 
-let translate labelStream instruction =
+let translate freeLabel instruction =
     match instruction with
-    | VirtualMachine.Comment line -> comment line
     | VirtualMachine.Push location -> push location
     | VirtualMachine.Pop location -> pop location
     | VirtualMachine.Add -> operator2 Assembly.Add
     | VirtualMachine.Subtract -> operator2 Assembly.Sub
     | VirtualMachine.Negate -> operator1 Assembly.Negate
-    | VirtualMachine.Equal -> labelStream () |> compare2 Assembly.Equal
-    | VirtualMachine.GreaterThan -> labelStream () |> compare2 Assembly.GreaterStrict
-    | VirtualMachine.LessThan -> labelStream () |> compare2 Assembly.LessStrict
+    | VirtualMachine.Equal -> freeLabel |> compare2 Assembly.Equal
+    | VirtualMachine.GreaterThan -> freeLabel |> compare2 Assembly.GreaterStrict
+    | VirtualMachine.LessThan -> freeLabel |> compare2 Assembly.LessStrict
     | VirtualMachine.And -> operator2 Assembly.And
     | VirtualMachine.Or -> operator2 Assembly.Or
     | VirtualMachine.Not -> operator1 Assembly.Not

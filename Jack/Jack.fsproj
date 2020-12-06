@@ -9,6 +9,7 @@
     <Compile Include="Assembly.fs" />
     <Compile Include="Translator.fs" />
     <Compile Include="UseCases.fs" />
+    <Compile Include="FileOI.fs" />
     <Compile Include="EntryPoint.fs" />
   </ItemGroup>
 </Project>

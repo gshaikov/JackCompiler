@@ -53,7 +53,7 @@ module translate =
 
         [<Theory; MemberData("testCases")>]
         let Test (instruction: VirtualMachine.Instruction, expected: Assembly.Instruction list) =
-            let result = translate (fun () -> "") instruction
+            let result = translate "" instruction
             Assert.StrictEqual(expected, result)
 
 
@@ -94,7 +94,7 @@ module translate =
 
         [<Theory; MemberData("testCases")>]
         let Test (instruction: VirtualMachine.Instruction, expected: Assembly.Instruction list) =
-            let result = translate (fun () -> "") instruction
+            let result = translate "" instruction
             Assert.StrictEqual(expected, result)
 
     module Add =
@@ -111,7 +111,7 @@ module translate =
 
         [<Theory; MemberData("testCases")>]
         let Test (instruction: VirtualMachine.Instruction, expected: Assembly.Instruction list) =
-            let result = translate (fun () -> "") instruction
+            let result = translate "" instruction
             Assert.StrictEqual(expected, result)
 
     module Negate =
@@ -126,7 +126,7 @@ module translate =
 
         [<Theory; MemberData("testCases")>]
         let Test (instruction: VirtualMachine.Instruction, expected: Assembly.Instruction list) =
-            let result = translate (fun () -> "") instruction
+            let result = translate "" instruction
             Assert.StrictEqual(expected, result)
 
     module GreaterThan =
@@ -144,13 +144,14 @@ module translate =
                          AI(Address.Variable "label_end_if")
                          CI(D, Zero, JumpAnyway)
                          Label "label_if_true"
-                         CI(D, One, NoJump)
-                         Label "label_end_if" ] |]
+                         CI(D, MinusOne, NoJump)
+                         Label "label_end_if"
+                         AI(Address.MemorySegmentPointer Address.StackPointer)
+                         CI(A, Dec Reg.M, NoJump)
+                         CI(M, Just Reg.D, NoJump) ] |]
             }
 
         [<Theory; MemberData("testCases")>]
         let Test (instruction: VirtualMachine.Instruction, expected: Assembly.Instruction list) =
-            let result =
-                translate (fun () -> "label") instruction
-
+            let result = translate "label" instruction
             Assert.StrictEqual(expected, result)
