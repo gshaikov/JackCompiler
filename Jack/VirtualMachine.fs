@@ -15,6 +15,7 @@ type MemorySegment =
     | Temp of int
 
 type Instruction =
+    | Comment of string
     | Push of MemorySegment
     | Pop of MemorySegment
     | Add
@@ -26,6 +27,8 @@ type Instruction =
     | And
     | Or
     | Not
+
+let parseComment line = Comment line |> Ok
 
 let private parse1 instruction =
     match instruction with
@@ -76,7 +79,9 @@ let private parse3 fileName (instruction: string array) =
 let parse fileName (instruction: string) =
     let sarr = instruction.Split [| ' ' |]
     let arrLen = Array.length sarr
-    if arrLen = 1 then
+    if sarr.[0] = "//" then
+        parseComment instruction
+    elif arrLen = 1 then
         parse1 instruction
     elif arrLen = 3 then
         parse3 fileName sarr

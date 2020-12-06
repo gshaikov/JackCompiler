@@ -109,11 +109,13 @@ type Jump =
         | NoJump -> None
 
 type Instruction =
+    | Comment of string
     | AI of Address.T
     | CI of Dest * Comp * Jump
     | Label of string
     member this.ToAssembly() =
         match this with
+        | Comment line -> line
         | AI addr -> "@" + addr.ToAssembly()
         | CI (dest, comp, jump) ->
             match (dest.ToAssembly(), jump.ToAssembly()) with

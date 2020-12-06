@@ -4,6 +4,8 @@ open Jack.Assembly
 
 let TempBaseAddress = 5
 
+let comment line = [ Assembly.Comment line ]
+
 let push location =
     let loadOffset offset =
         [ AI(Address.Value offset)
@@ -40,7 +42,9 @@ let push location =
         @ loadValueWithOffsetFromSegment Address.That
         @ writeToStack
     | VirtualMachine.Constant c -> loadOffset c @ writeToStack
-    | VirtualMachine.Static name -> loadValueFrom (Address.Variable name) @ writeToStack
+    | VirtualMachine.Static name ->
+        loadValueFrom (Address.Variable name)
+        @ writeToStack
     | VirtualMachine.Pointer p ->
         match p with
         | VirtualMachine.ToThis ->
@@ -127,6 +131,7 @@ let compare2 jmp freeLabel =
 
 let translate labelStream instruction =
     match instruction with
+    | VirtualMachine.Comment line -> comment line
     | VirtualMachine.Push location -> push location
     | VirtualMachine.Pop location -> pop location
     | VirtualMachine.Add -> operator2 Assembly.Add
