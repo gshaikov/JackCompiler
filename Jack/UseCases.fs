@@ -1,12 +1,17 @@
 module Jack.UseCases
 
+open Jack.Compositions
+
 let createLabelStream baseLabel =
-    let mutable s =
-        Seq.initInfinite (fun i -> sprintf "%s_%i" baseLabel i)
+    let mutable labelSuffix = 0
 
     let inner () =
-        let res = Seq.head s
-        s <- Seq.tail s
-        res
+        labelSuffix <- labelSuffix + 1
+        sprintf "%s_%i" baseLabel labelSuffix
 
     inner
+
+let translateInstruction vmFileName =
+    VirtualMachine.parse vmFileName
+    >> map (Translator.translate (createLabelStream "__AUTO_LABEL"))
+    >> map Assembly.serialiseList

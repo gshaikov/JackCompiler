@@ -126,3 +126,6 @@ type Instruction =
         | Label lbl -> "(" + lbl + ")"
 
 let serialise (instruction: Instruction) = instruction.ToAssembly()
+
+let serialiseList (instructions: Instruction list) =
+    List.fold (fun line (instr: Instruction) -> line + instr.ToAssembly() + "\n") "" instructions
